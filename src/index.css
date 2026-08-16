@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+
+/* Tokens portados do mobile (src/design/tokens.ts) — tema escuro Sir Barbecue. */
+@theme {
+  --color-bg: #1a1a1a;
+  --color-surface: #252525;
+  --color-surface-hover: #2e2e2e;
+  --color-gold: #d4a017;
+  --color-gold-light: #e8ba2a;
+  --color-red: #8b1e1e;
+  --color-red-hover: #a32323;
+  --color-green: #27ae60;
+  --color-yellow: #f39c12;
+  --color-danger: #e74c3c;
+  --color-divider: #333333;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #b0b0b0;
+  --color-on-gold: #000000;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar discreta no tema escuro */
+* {
+  scrollbar-color: var(--color-divider) transparent;
+}
