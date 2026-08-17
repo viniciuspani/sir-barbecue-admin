@@ -128,13 +128,13 @@ export type ErrorLogFilters = {
 };
 
 // --- Saúde do sistema -------------------------------------------------
-// Duas fontes distintas: o endpoint /saude responde "está no ar AGORA" (ping ao
+// Duas fontes distintas: o endpoint /health responde "está no ar AGORA" (ping ao
 // vivo, sem passar pelo banco); health_events guarda o histórico de quedas, que
 // chega pelo webhook do monitor externo.
 
 export type HealthProbe = { ok: boolean; latency_ms: number; error?: string };
 
-/** Resposta crua da Edge Function `saude` (endpoint público). */
+/** Resposta crua da Edge Function `health` (endpoint público). */
 export type HealthNow = {
   status: 'ok' | 'down';
   service: string;

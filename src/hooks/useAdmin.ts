@@ -249,11 +249,14 @@ export function useErrorLogDetail(id: string | null) {
 
 // --- Saúde do sistema -------------------------------------------------
 
-/** URL pública da Edge Function `saude` (VITE_SAUDE_URL no .env). */
-const SAUDE_URL = (import.meta.env.VITE_SAUDE_URL as string | undefined) ?? '';
+/** URL pública da Edge Function `health` (VITE_HEALTH_URL no .env). */
+const HEALTH_URL = (import.meta.env.VITE_HEALTH_URL as string | undefined) ?? '';
+
+/** Marcador para o card distinguir "falta configurar" de "backend caiu". */
+export const HEALTH_URL_MISSING = 'health_url_missing';
 
 /**
- * "Está no ar AGORA?" — ping direto na Edge Function `saude`, sem passar pelo
+ * "Está no ar AGORA?" — ping direto na Edge Function `health`, sem passar pelo
  * supabase-js (funciona até com a sessão do painel expirada). Revalida a cada 30s.
  *
  * Importante: HTTP 503 NÃO é erro aqui — é o backend dizendo "o banco caiu", e o
@@ -268,8 +271,12 @@ export function useHealthNow() {
     retry: false,
     gcTime: 0,
     queryFn: async (): Promise<HealthNow> => {
-      if (USE_MOCK || !SAUDE_URL) return mockHealthNow;
-      const res = await fetch(SAUDE_URL, { cache: 'no-store' });
+      if (USE_MOCK) return mockHealthNow;
+      // Fora do modo mock, faltar a URL é ERRO — nunca cair no mock aqui. Um card
+      // de saúde permanentemente verde por falta de config é pior que card nenhum:
+      // ele mente exatamente na hora em que você mais precisa dele.
+      if (!HEALTH_URL) throw new Error(HEALTH_URL_MISSING);
+      const res = await fetch(HEALTH_URL, { cache: 'no-store' });
       return (await res.json()) as HealthNow;
     },
   });

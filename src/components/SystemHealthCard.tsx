@@ -2,7 +2,7 @@ import { Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { Card } from '@/components/ui/Card';
-import { useHealthNow } from '@/hooks/useAdmin';
+import { HEALTH_URL_MISSING, useHealthNow } from '@/hooks/useAdmin';
 import { cn } from '@/lib/cn';
 import type { HealthNow } from '@/types';
 
@@ -14,7 +14,7 @@ const toneClass: Record<Tone, { dot: string; text: string; accent: string }> = {
   muted: { dot: 'bg-text-secondary', text: 'text-text-secondary', accent: 'bg-text-secondary/15' },
 };
 
-/** Motivos técnicos do /saude traduzidos para o que o dono precisa saber. */
+/** Motivos técnicos do /health traduzidos para o que o dono precisa saber. */
 const motivos: Record<string, string> = {
   db_unreachable: 'o banco de dados não respondeu',
   db_error: 'o banco recusou a consulta',
@@ -25,9 +25,19 @@ const motivos: Record<string, string> = {
 function resolve(
   isLoading: boolean,
   isError: boolean,
+  error: Error | null,
   data: HealthNow | undefined,
 ): { label: string; detail: string; tone: Tone } {
-  if (isLoading) return { label: 'Verificando…', detail: 'Consultando o endpoint /saude', tone: 'muted' };
+  if (isLoading) return { label: 'Verificando…', detail: 'Consultando o endpoint /health', tone: 'muted' };
+
+  // Falta de configuração NÃO pode se disfarçar de "tudo bem" nem de "caiu".
+  if (error?.message === HEALTH_URL_MISSING) {
+    return {
+      label: 'Não configurado',
+      detail: 'Defina VITE_HEALTH_URL no .env / Netlify e refaça o build do painel',
+      tone: 'muted',
+    };
+  }
 
   // Sem resposta nenhuma: ou o Supabase inteiro está fora, ou o CORS bloqueou o
   // navegador (ALLOWED_ORIGIN). Vale distinguir os dois no texto para não caçar
@@ -53,13 +63,13 @@ function resolve(
 }
 
 /**
- * Estado do backend AGORA (ping ao vivo no /saude, revalidado a cada 30s).
+ * Estado do backend AGORA (ping ao vivo no /health, revalidado a cada 30s).
  * Não substitui o monitor externo: se o Supabase cair por completo, este painel
  * também não abre. Serve para conferir na hora e para ver a latência do banco.
  */
 export function SystemHealthCard({ compact = false }: { compact?: boolean }) {
-  const { data, isLoading, isError, dataUpdatedAt } = useHealthNow();
-  const { label, detail, tone } = resolve(isLoading, isError, data);
+  const { data, isLoading, isError, error, dataUpdatedAt } = useHealthNow();
+  const { label, detail, tone } = resolve(isLoading, isError, error, data);
   const t = toneClass[tone];
 
   const verificadoAs = dataUpdatedAt
