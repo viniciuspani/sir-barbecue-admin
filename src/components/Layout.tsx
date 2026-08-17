@@ -1,4 +1,4 @@
-import { AlertTriangle, BarChart3, LayoutDashboard, LogOut, Settings, Users } from 'lucide-react';
+import { Activity, AlertTriangle, BarChart3, LayoutDashboard, LogOut, Settings, Users } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 
@@ -10,6 +10,7 @@ const nav = [
   { to: '/clientes', label: 'Clientes', icon: Users, end: false },
   { to: '/financeiro', label: 'Financeiro', icon: BarChart3, end: false },
   { to: '/erros', label: 'Erros', icon: AlertTriangle, end: false },
+  { to: '/saude', label: 'Saúde', icon: Activity, end: false },
   { to: '/configuracoes', label: 'Configurações', icon: Settings, end: false },
 ];
 

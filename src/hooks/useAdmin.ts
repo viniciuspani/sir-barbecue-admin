@@ -5,6 +5,9 @@ import {
   mockErrorLogs,
   mockExpenses,
   mockFinance,
+  mockHealthEvents,
+  mockHealthNow,
+  mockHealthSummary,
   mockPriceHistoryRetention,
   mockTenantDetail,
   mockTenants,
@@ -16,6 +19,9 @@ import type {
   ErrorLogFilters,
   Expense,
   FinanceSummary,
+  HealthEvent,
+  HealthNow,
+  HealthSummary,
   PaymentMethod,
   PriceHistoryCleanupResult,
   PriceHistoryRetention,
@@ -32,6 +38,9 @@ const keys = {
   priceHistoryRetention: ['priceHistoryRetention'] as const,
   errorLogs: (f: ErrorLogFilters) => ['errorLogs', f] as const,
   errorLog: (id: string) => ['errorLog', id] as const,
+  healthNow: ['healthNow'] as const,
+  healthSummary: (days: number) => ['healthSummary', days] as const,
+  healthEvents: (limit: number) => ['healthEvents', limit] as const,
 };
 
 /** Lista de clientes (RPC admin_list_tenants_overview). */
@@ -234,6 +243,60 @@ export function useErrorLogDetail(id: string | null) {
       const { data, error } = await supabase.rpc('admin_error_log_detail', { p_id: id });
       if (error) throw error;
       return (data ?? null) as ErrorLogDetail | null;
+    },
+  });
+}
+
+// --- Saúde do sistema -------------------------------------------------
+
+/** URL pública da Edge Function `saude` (VITE_SAUDE_URL no .env). */
+const SAUDE_URL = (import.meta.env.VITE_SAUDE_URL as string | undefined) ?? '';
+
+/**
+ * "Está no ar AGORA?" — ping direto na Edge Function `saude`, sem passar pelo
+ * supabase-js (funciona até com a sessão do painel expirada). Revalida a cada 30s.
+ *
+ * Importante: HTTP 503 NÃO é erro aqui — é o backend dizendo "o banco caiu", e o
+ * corpo vem com o motivo. Erro de verdade (isError) significa que nem resposta
+ * houve: Supabase inteiro fora, ou CORS/ALLOWED_ORIGIN mal configurado.
+ */
+export function useHealthNow() {
+  return useQuery({
+    queryKey: keys.healthNow,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
+    retry: false,
+    gcTime: 0,
+    queryFn: async (): Promise<HealthNow> => {
+      if (USE_MOCK || !SAUDE_URL) return mockHealthNow;
+      const res = await fetch(SAUDE_URL, { cache: 'no-store' });
+      return (await res.json()) as HealthNow;
+    },
+  });
+}
+
+/** Resumo de uptime do período (RPC admin_health_summary). */
+export function useHealthSummary(days = 30) {
+  return useQuery({
+    queryKey: keys.healthSummary(days),
+    queryFn: async (): Promise<HealthSummary> => {
+      if (USE_MOCK) return mockHealthSummary;
+      const { data, error } = await supabase.rpc('admin_health_summary', { p_days: days });
+      if (error) throw error;
+      return data as HealthSummary;
+    },
+  });
+}
+
+/** Histórico de quedas e retornos registrado pelo monitor externo. */
+export function useHealthEvents(limit = 100) {
+  return useQuery({
+    queryKey: keys.healthEvents(limit),
+    queryFn: async (): Promise<HealthEvent[]> => {
+      if (USE_MOCK) return mockHealthEvents;
+      const { data, error } = await supabase.rpc('admin_list_health_events', { p_limit: limit });
+      if (error) throw error;
+      return (data ?? []) as HealthEvent[];
     },
   });
 }

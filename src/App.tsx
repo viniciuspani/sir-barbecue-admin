@@ -10,6 +10,7 @@ import { Dashboard } from '@/pages/Dashboard';
 import { Erros } from '@/pages/Erros';
 import { Financeiro } from '@/pages/Financeiro';
 import { Login } from '@/pages/Login';
+import { Saude } from '@/pages/Saude';
 import { TrocarSenha } from '@/pages/TrocarSenha';
 
 export function App() {
@@ -48,6 +49,7 @@ function AdminApp() {
       <Route path="/clientes/:tenantId" element={<ClienteDetalhe />} />
       <Route path="/financeiro" element={<Financeiro />} />
       <Route path="/erros" element={<Erros />} />
+      <Route path="/saude" element={<Saude />} />
       <Route path="/configuracoes" element={<Configuracoes />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

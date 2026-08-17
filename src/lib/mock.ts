@@ -4,6 +4,9 @@ import type {
   ErrorLogFilters,
   Expense,
   FinanceSummary,
+  HealthEvent,
+  HealthNow,
+  HealthSummary,
   Payment,
   PriceHistoryRetention,
   TenantDetail,
@@ -212,6 +215,58 @@ export function mockErrorLogs(filters: ErrorLogFilters): ErrorLog[] {
 export function mockErrorLogDetail(id: string): ErrorLogDetail | null {
   return mockErrorList.find((l) => l.id === id) ?? null;
 }
+
+// --- Saúde do sistema ---
+// Horários relativos a "agora" para o mock não envelhecer na tela.
+const minutosAtras = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
+
+export const mockHealthNow: HealthNow = {
+  status: 'ok',
+  service: 'sir-barbecue',
+  version: '0.1.0',
+  checks: { edge: { ok: true, latency_ms: 0 }, database: { ok: true, latency_ms: 41 } },
+  ts: new Date().toISOString(),
+};
+
+export const mockHealthEvents: HealthEvent[] = [
+  {
+    id: 'h1',
+    monitorName: 'Sir Barbecue Backend',
+    status: 'online',
+    occurredAt: minutosAtras(60 * 26),
+    errors: [],
+  },
+  {
+    id: 'h2',
+    monitorName: 'Sir Barbecue Backend',
+    status: 'offline',
+    occurredAt: minutosAtras(60 * 26 + 7),
+    errors: ['timeout', 'HTTP 503'],
+  },
+  {
+    id: 'h3',
+    monitorName: 'Sir Barbecue Backend',
+    status: 'online',
+    occurredAt: minutosAtras(60 * 24 * 9),
+    errors: [],
+  },
+  {
+    id: 'h4',
+    monitorName: 'Sir Barbecue Backend',
+    status: 'offline',
+    occurredAt: minutosAtras(60 * 24 * 9 + 2),
+    errors: ['keyword not found'],
+  },
+];
+
+export const mockHealthSummary: HealthSummary = {
+  days: 30,
+  currentStatus: 'online',
+  since: minutosAtras(60 * 26),
+  incidents: 2,
+  downtimeMinutes: 9,
+  uptimePercent: 99.9792,
+};
 
 export const mockFinance: FinanceSummary = {
   monthlyRevenue: 159.8,

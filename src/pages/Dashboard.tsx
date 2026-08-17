@@ -2,6 +2,7 @@ import { AlertTriangle, CheckCircle2, Clock, TrendingUp } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 import { Layout, PageHeader } from '@/components/Layout';
+import { SystemHealthCard } from '@/components/SystemHealthCard';
 import { Card } from '@/components/ui/Card';
 import { CenteredSpinner } from '@/components/ui/Spinner';
 import { useFinanceSummary } from '@/hooks/useAdmin';
@@ -56,7 +57,8 @@ export function Dashboard() {
             />
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <SystemHealthCard compact />
             <Kpi
               label="Em trial"
               value={String(data.trialCount)}

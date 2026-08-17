@@ -127,6 +127,44 @@ export type ErrorLogFilters = {
   search?: string | null;
 };
 
+// --- Saúde do sistema -------------------------------------------------
+// Duas fontes distintas: o endpoint /saude responde "está no ar AGORA" (ping ao
+// vivo, sem passar pelo banco); health_events guarda o histórico de quedas, que
+// chega pelo webhook do monitor externo.
+
+export type HealthProbe = { ok: boolean; latency_ms: number; error?: string };
+
+/** Resposta crua da Edge Function `saude` (endpoint público). */
+export type HealthNow = {
+  status: 'ok' | 'down';
+  service: string;
+  version: string;
+  checks: { edge: HealthProbe; database: HealthProbe };
+  ts: string;
+};
+
+/** Evento de queda/retorno registrado pelo monitor (RPC admin_list_health_events). */
+export type HealthEvent = {
+  id: string;
+  monitorName: string;
+  status: 'online' | 'offline';
+  occurredAt: string;
+  /** Motivos por localidade quando caiu: ["timeout", "keyword not found"]. */
+  errors: string[];
+};
+
+/** Resumo do período (RPC admin_health_summary). */
+export type HealthSummary = {
+  days: number;
+  /** 'unknown' = o monitor ainda não registrou nenhum evento. */
+  currentStatus: 'online' | 'offline' | 'unknown';
+  /** Desde quando está nesse estado. */
+  since: string | null;
+  incidents: number;
+  downtimeMinutes: number;
+  uptimePercent: number;
+};
+
 /** Resumo financeiro (RPC admin_finance_summary). */
 export type FinanceSummary = {
   monthlyRevenue: number; // MRR
