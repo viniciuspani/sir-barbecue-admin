@@ -2,6 +2,7 @@ import { X } from 'lucide-react';
 import { useState } from 'react';
 
 import { Layout, PageHeader } from '@/components/Layout';
+import { DataCard, EmptyState } from '@/components/ui/DataCard';
 import { Input, Select } from '@/components/ui/Input';
 import { CenteredSpinner } from '@/components/ui/Spinner';
 import { useErrorLogDetail, useErrorLogs, useTenantsOverview } from '@/hooks/useAdmin';
@@ -46,7 +47,7 @@ function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-xs text-text-secondary">{label}</p>
-      <p className="text-sm text-text-primary">{value}</p>
+      <p className="break-words text-sm text-text-primary">{value}</p>
     </div>
   );
 }
@@ -55,8 +56,8 @@ function DetailPanel({ id, onClose }: { id: string; onClose: () => void }) {
   const { data, isLoading } = useErrorLogDetail(id);
 
   return (
-    <aside className="fixed right-0 top-0 z-20 flex h-full w-full max-w-xl flex-col border-l border-divider bg-surface shadow-2xl">
-      <div className="flex items-start justify-between border-b border-divider px-6 py-4">
+    <aside className="fixed right-0 top-0 z-50 flex h-full w-full max-w-xl flex-col border-l border-divider bg-surface shadow-2xl">
+      <div className="flex items-start justify-between border-b border-divider px-4 py-4 sm:px-6">
         <div>
           <p className="text-xs text-text-secondary">Código de referência</p>
           <p className="font-mono text-lg font-bold tracking-widest text-gold">
@@ -75,8 +76,8 @@ function DetailPanel({ id, onClose }: { id: string; onClose: () => void }) {
       {isLoading || !data ? (
         <CenteredSpinner />
       ) : (
-        <div className="flex-1 space-y-6 overflow-auto px-6 py-5">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex-1 space-y-6 overflow-auto px-4 py-5 sm:px-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Quando aconteceu" value={formatDateTime(data.occurredAt)} />
             <Field label="Chegou ao servidor" value={formatDateTime(data.createdAt)} />
             <Field label="Empresa" value={data.tenantName ?? 'Sem empresa (antes do vínculo)'} />
@@ -118,7 +119,7 @@ function DetailPanel({ id, onClose }: { id: string; onClose: () => void }) {
             </div>
           ) : null}
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Field label="Papel" value={data.context?.role ?? '—'} />
             <Field
               label="Conexão"
@@ -163,17 +164,17 @@ export function Erros() {
         subtitle="Falhas registradas pelo aplicativo, com data, hora e o que o usuário estava fazendo"
       />
 
-      <div className="mb-4 flex gap-3">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <Input
           placeholder="Buscar por código, ação ou mensagem…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
+          className="sm:max-w-sm"
         />
         <Select
           value={severity}
           onChange={(e) => setSeverity(e.target.value as ErrorSeverity | 'all')}
-          className="max-w-[180px]"
+          className="sm:max-w-[180px]"
         >
           <option value="all">Todas as gravidades</option>
           <option value="error">Erro</option>
@@ -182,7 +183,7 @@ export function Erros() {
         <Select
           value={tenantId}
           onChange={(e) => setTenantId(e.target.value)}
-          className="max-w-[220px]"
+          className="sm:max-w-[220px]"
         >
           <option value="all">Todas as empresas</option>
           {(tenants ?? []).map((t) => (
@@ -196,7 +197,36 @@ export function Erros() {
       {isLoading ? (
         <CenteredSpinner />
       ) : (
-        <div className="overflow-hidden rounded-[var(--radius-lg)] border border-divider">
+        <>
+        {/* Mobile: cartões empilhados — a tabela de 7 colunas não cabe no celular. */}
+        <div className="flex flex-col gap-3 lg:hidden">
+          {rows.map((l) => (
+            <DataCard key={l.id} onClick={() => setSelectedId(l.id)}>
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-mono text-sm font-medium tracking-wider text-gold">
+                  {l.refCode}
+                </span>
+                <SeverityBadge severity={l.severity} />
+              </div>
+              <p className="mt-1 text-xs text-text-secondary">{formatDateTime(l.occurredAt)}</p>
+              <p className="mt-2 line-clamp-2 text-sm text-text-primary">{l.message}</p>
+              <p className="mt-2 border-t border-divider pt-2 text-xs text-text-secondary">
+                {l.tenantName ?? 'Sem empresa'}
+                {l.userEmail ? ` · ${l.userEmail}` : ''}
+              </p>
+              {l.action || l.screen ? (
+                <p className="mt-0.5 text-xs text-text-secondary">
+                  {[l.action, l.screen].filter(Boolean).join(' · ')}
+                </p>
+              ) : null}
+            </DataCard>
+          ))}
+          {rows.length === 0 ? (
+            <EmptyState>Nenhum erro registrado com estes filtros. 🎉</EmptyState>
+          ) : null}
+        </div>
+
+        <div className="hidden overflow-hidden rounded-[var(--radius-lg)] border border-divider lg:block">
           <table className="w-full text-sm">
             <thead className="bg-surface text-left text-text-secondary">
               <tr>
@@ -248,6 +278,7 @@ export function Erros() {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       {selectedId ? <DetailPanel id={selectedId} onClose={() => setSelectedId(null)} /> : null}

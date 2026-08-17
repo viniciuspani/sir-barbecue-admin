@@ -65,7 +65,7 @@ export function Financeiro() {
 
           <Card className="mt-4">
             <CardTitle className="mb-4">Receita × Despesa (mensal)</CardTitle>
-            <div className="h-72 w-full">
+            <div className="h-60 w-full sm:h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#333333" />
@@ -91,12 +91,12 @@ export function Financeiro() {
               ) : (
                 <ul className="flex flex-col gap-2">
                   {(expenses.data ?? []).map((ex) => (
-                    <li key={ex.id} className="flex items-center justify-between border-b border-divider py-2 last:border-0">
-                      <div>
-                        <p className="text-sm text-text-primary">{ex.name}</p>
-                        <p className="text-xs text-text-secondary">{ex.category}{ex.recurring ? ' · recorrente' : ''}</p>
+                    <li key={ex.id} className="flex items-center justify-between gap-3 border-b border-divider py-2 last:border-0">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm text-text-primary">{ex.name}</p>
+                        <p className="truncate text-xs text-text-secondary">{ex.category}{ex.recurring ? ' · recorrente' : ''}</p>
                       </div>
-                      <span className="text-sm font-medium text-danger">{formatBRL(ex.amount)}</span>
+                      <span className="shrink-0 text-sm font-medium text-danger">{formatBRL(ex.amount)}</span>
                     </li>
                   ))}
                   {(expenses.data ?? []).length === 0 ? (
@@ -113,7 +113,7 @@ export function Financeiro() {
                   <label className="mb-1 block text-xs text-text-secondary">Serviço</label>
                   <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Supabase Pro" />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
                     <label className="mb-1 block text-xs text-text-secondary">Categoria</label>
                     <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Infraestrutura" />

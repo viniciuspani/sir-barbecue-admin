@@ -46,7 +46,7 @@ export function Configuracoes() {
 
       <Card className="max-w-xl">
         <CardTitle>Limpeza do histórico de preço de compra</CardTitle>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="mt-1 break-words text-sm text-text-secondary">
           Registros de <code className="text-xs">product_supplier_price_history</code> mais antigos que a retenção
           configurada são apagados automaticamente (agendamento pg_cron) e podem também ser limpos na hora.
         </p>
@@ -57,7 +57,7 @@ export function Configuracoes() {
           </div>
         ) : (
           <>
-            <form onSubmit={onSaveRetention} className="mt-4 flex items-end gap-3">
+            <form onSubmit={onSaveRetention} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
               <div>
                 <label className="mb-1 block text-xs text-text-secondary">Retenção (meses)</label>
                 <Input
@@ -66,7 +66,7 @@ export function Configuracoes() {
                   inputMode="numeric"
                   value={months}
                   onChange={(e) => setMonths(e.target.value)}
-                  className="w-32"
+                  className="w-full sm:w-32"
                 />
               </div>
               <Button type="submit" disabled={setRetention.isPending}>
@@ -76,7 +76,7 @@ export function Configuracoes() {
               {setRetention.isError ? <span className="text-sm text-danger">Erro ao salvar.</span> : null}
             </form>
 
-            <form onSubmit={onRunNow} className="mt-6 flex items-end gap-3 border-t border-divider pt-4">
+            <form onSubmit={onRunNow} className="mt-6 flex flex-col gap-3 border-t border-divider pt-4 sm:flex-row sm:items-end">
               <div>
                 <label className="mb-1 block text-xs text-text-secondary">Rodar agora com (opcional)</label>
                 <Input
@@ -86,7 +86,7 @@ export function Configuracoes() {
                   placeholder={String(retention.data?.retentionMonths ?? '')}
                   value={runMonths}
                   onChange={(e) => setRunMonths(e.target.value)}
-                  className="w-32"
+                  className="w-full sm:w-32"
                 />
               </div>
               <Button type="submit" variant="outline" disabled={runCleanup.isPending}>

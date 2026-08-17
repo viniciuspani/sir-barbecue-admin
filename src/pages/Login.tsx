@@ -23,7 +23,7 @@ export function Login() {
 
   return (
     <div className="flex h-full items-center justify-center px-4">
-      <form onSubmit={onSubmit} className="w-full max-w-sm rounded-[var(--radius-lg)] border border-divider bg-surface p-8">
+      <form onSubmit={onSubmit} className="w-full max-w-sm rounded-[var(--radius-lg)] border border-divider bg-surface p-6 sm:p-8">
         <p className="text-center text-2xl font-bold text-gold">Sir Barbecue</p>
         <p className="mb-6 text-center text-sm text-text-secondary">Painel do dono</p>
 

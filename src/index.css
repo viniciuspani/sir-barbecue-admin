@@ -36,6 +36,18 @@ body {
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  /* Mobile: sem flash cinza ao tocar e sem "bounce" arrastando a página. */
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+/* iOS dá zoom no campo focado quando a fonte é menor que 16px. */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 /* Scrollbar discreta no tema escuro */

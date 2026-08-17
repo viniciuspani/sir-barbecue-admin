@@ -17,7 +17,7 @@ function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-xs text-text-secondary">{label}</p>
-      <p className="text-sm text-text-primary">{value}</p>
+      <p className="break-words text-sm text-text-primary">{value}</p>
     </div>
   );
 }
@@ -77,7 +77,7 @@ export function ClienteDetalhe() {
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <Card>
               <CardTitle className="mb-4">Assinatura</CardTitle>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <p className="text-xs text-text-secondary">Status</p>
                   <StatusBadge status={data.status} />
@@ -98,9 +98,9 @@ export function ClienteDetalhe() {
               ) : (
                 <ul className="flex flex-col gap-2">
                   {data.devices.map((d) => (
-                    <li key={d.deviceId} className="flex items-center justify-between rounded-[var(--radius-md)] bg-bg px-3 py-2">
-                      <div>
-                        <p className="font-mono text-xs text-text-primary">{d.deviceId}</p>
+                    <li key={d.deviceId} className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] bg-bg px-3 py-2">
+                      <div className="min-w-0">
+                        <p className="truncate font-mono text-xs text-text-primary">{d.deviceId}</p>
                         <p className="text-xs text-text-secondary">
                           {d.platform ?? '—'} · visto em {formatDate(d.lastSeenAt)}
                         </p>
@@ -144,7 +144,7 @@ export function ClienteDetalhe() {
                     placeholder="79,90"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
                     <label className="mb-1 block text-xs text-text-secondary">Forma</label>
                     <Select value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)}>

@@ -58,7 +58,7 @@ export function ConfirmarEmail() {
 
   return (
     <div className="flex h-full items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-[var(--radius-lg)] border border-divider bg-surface p-8 text-center">
+      <div className="w-full max-w-sm rounded-[var(--radius-lg)] border border-divider bg-surface p-6 text-center sm:p-8">
         <p className="mb-6 text-2xl font-bold text-gold">Sir Barbecue</p>
 
         {phase === 'verifying' && (

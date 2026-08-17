@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Layout, PageHeader } from '@/components/Layout';
 import { SystemHealthCard } from '@/components/SystemHealthCard';
 import { Card } from '@/components/ui/Card';
+import { DataCard, DataRow, EmptyState } from '@/components/ui/DataCard';
 import { CenteredSpinner } from '@/components/ui/Spinner';
 import { useHealthEvents, useHealthSummary } from '@/hooks/useAdmin';
 import { cn } from '@/lib/cn';
@@ -107,7 +108,34 @@ export function Saude() {
       {carregandoEventos ? (
         <CenteredSpinner />
       ) : (
-        <div className="overflow-hidden rounded-[var(--radius-lg)] border border-divider">
+        <>
+        {/* Mobile: cartões empilhados no lugar da tabela. */}
+        <div className="flex flex-col gap-3 lg:hidden">
+          {rows.map((e, i) => (
+            <DataCard key={e.id}>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm text-text-secondary">{formatDateTime(e.occurredAt)}</span>
+                <EventBadge status={e.status} />
+              </div>
+              <div className="mt-2 border-t border-divider pt-1">
+                <DataRow label="Ficou fora" value={duracao(rows, i)} />
+                <DataRow label="Motivo" value={e.errors.length > 0 ? e.errors.join(' · ') : '—'} />
+                <DataRow label="Monitor" value={e.monitorName} />
+              </div>
+            </DataCard>
+          ))}
+          {rows.length === 0 ? (
+            <EmptyState>
+              Nenhuma queda registrada. 🎉
+              <span className="mt-1 block text-xs">
+                Se o monitor externo ainda não foi ligado ao webhook, esta lista fica vazia mesmo
+                depois de uma queda.
+              </span>
+            </EmptyState>
+          ) : null}
+        </div>
+
+        <div className="hidden overflow-hidden rounded-[var(--radius-lg)] border border-divider lg:block">
           <table className="w-full text-sm">
             <thead className="bg-surface text-left text-text-secondary">
               <tr>
@@ -148,6 +176,7 @@ export function Saude() {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       <div className="mt-4 flex items-start gap-3 rounded-[var(--radius-md)] border border-divider bg-surface px-4 py-3">
