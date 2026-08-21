@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -58,6 +59,16 @@ export function Login() {
             Modo demonstração — qualquer credencial entra.
           </p>
         ) : null}
+
+        <p className="mt-6 text-center text-xs text-text-secondary">
+          <Link to="/termos-de-uso" className="hover:text-text-primary">
+            Termos de Uso
+          </Link>
+          {' · '}
+          <Link to="/politica-de-privacidade" className="hover:text-text-primary">
+            Política de Privacidade
+          </Link>
+        </p>
       </form>
     </div>
   );

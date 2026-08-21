@@ -10,17 +10,22 @@ import { Dashboard } from '@/pages/Dashboard';
 import { Erros } from '@/pages/Erros';
 import { Financeiro } from '@/pages/Financeiro';
 import { Login } from '@/pages/Login';
+import { PoliticaDePrivacidade } from '@/pages/PoliticaDePrivacidade';
 import { Saude } from '@/pages/Saude';
+import { TermosDeUso } from '@/pages/TermosDeUso';
 import { TrocarSenha } from '@/pages/TrocarSenha';
 
 export function App() {
   return (
     <Routes>
       {/* Rotas públicas: destino dos redirects de e-mail do Supabase (confirmação de
-          cadastro e recuperação de senha). Quem chega aqui é um usuário comum do app,
-          não o dono autenticado — por isso ficam fora do gate de admin abaixo. */}
+          cadastro e recuperação de senha) e páginas jurídicas do app. Quem chega aqui
+          não é necessariamente o dono autenticado — por isso ficam fora do gate de
+          admin abaixo. */}
       <Route path="/confirmar-email" element={<ConfirmarEmail />} />
       <Route path="/trocar-senha" element={<TrocarSenha />} />
+      <Route path="/termos-de-uso" element={<TermosDeUso />} />
+      <Route path="/politica-de-privacidade" element={<PoliticaDePrivacidade />} />
       <Route path="*" element={<AdminApp />} />
     </Routes>
   );
