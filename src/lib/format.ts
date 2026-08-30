@@ -6,7 +6,11 @@ export function formatBRL(value: number): string {
 
 export function formatDate(iso: string | null): string {
   if (!iso) return '—';
-  const d = new Date(iso);
+  // Uma string "YYYY-MM-DD" pura não tem fuso — o construtor Date a interpreta
+  // como UTC, o que desloca o dia exibido em fusos negativos (ex: Brasil). Trata
+  // como meia-noite local para exibir o mesmo dia que foi armazenado/escolhido.
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(iso);
+  const d = new Date(dateOnly ? `${iso}T00:00:00` : iso);
   if (Number.isNaN(d.getTime())) return '—';
   return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
 }

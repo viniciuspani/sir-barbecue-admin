@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Layout, PageHeader } from '@/components/Layout';
@@ -9,7 +9,14 @@ import { Card, CardTitle } from '@/components/ui/Card';
 import { Input, Select } from '@/components/ui/Input';
 import { CenteredSpinner } from '@/components/ui/Spinner';
 import { Switch } from '@/components/ui/Switch';
-import { useCreatePayment, useSetTenantAccess, useTenantDetail } from '@/hooks/useAdmin';
+import {
+  useActivateTenantSubscription,
+  useCreatePayment,
+  useExtendTenantTrial,
+  useSetTenantAccess,
+  useSetTenantTrialEndsAt,
+  useTenantDetail,
+} from '@/hooks/useAdmin';
 import { currentMonth, formatBRL, formatDate } from '@/lib/format';
 import type { PaymentMethod } from '@/types';
 
@@ -28,10 +35,19 @@ export function ClienteDetalhe() {
   const { data, isLoading } = useTenantDetail(tenantId);
   const setAccess = useSetTenantAccess();
   const createPayment = useCreatePayment();
+  const extendTrial = useExtendTenantTrial();
+  const setTrialEndsAt = useSetTenantTrialEndsAt();
+  const activateSubscription = useActivateTenantSubscription();
 
   const [amount, setAmount] = useState('');
   const [method, setMethod] = useState<PaymentMethod>('pix');
   const [month, setMonth] = useState(currentMonth());
+  const [trialAction, setTrialAction] = useState<'keep' | 'extend7'>('keep');
+  const [manualDate, setManualDate] = useState('');
+
+  useEffect(() => {
+    setManualDate(data?.endsAt?.slice(0, 10) ?? '');
+  }, [data?.endsAt]);
 
   function onLaunchPayment(e: FormEvent) {
     e.preventDefault();
@@ -41,6 +57,39 @@ export function ClienteDetalhe() {
       { tenantId, amount: value, method, referenceMonth: month },
       { onSuccess: () => setAmount('') },
     );
+  }
+
+  function onApplyTrialAction() {
+    if (trialAction !== 'extend7' || !data?.endsAt) return;
+    const novaData = new Date(data.endsAt);
+    novaData.setDate(novaData.getDate() + 7);
+    if (!window.confirm(`Prorrogar o trial para ${formatDate(novaData.toISOString())}?`)) return;
+    extendTrial.mutate(
+      { tenantId, days: 7 },
+      { onSuccess: () => setTrialAction('keep') },
+    );
+  }
+
+  function onActivateSubscription() {
+    const novoVencimento = new Date();
+    novoVencimento.setMonth(novoVencimento.getMonth() + 1);
+    if (
+      !window.confirm(
+        `Ativar a assinatura desta empresa? O vencimento ficará em ${formatDate(novoVencimento.toISOString())}.`,
+      )
+    ) {
+      return;
+    }
+    activateSubscription.mutate({ tenantId });
+  }
+
+  function onSaveManualDate() {
+    if (!manualDate || manualDate === data?.endsAt?.slice(0, 10)) return;
+    if (!window.confirm(`Alterar a data final do trial para ${formatDate(manualDate)}?`)) return;
+    // "YYYY-MM-DD" puro seria interpretado como meia-noite UTC pelo Postgres — em
+    // fusos negativos isso volta um dia ao ser exibido depois. Envia a meia-noite
+    // local do dia escolhido, já convertida para o instante UTC correspondente.
+    setTrialEndsAt.mutate({ tenantId, trialEndsAt: new Date(`${manualDate}T00:00:00`).toISOString() });
   }
 
   return (
@@ -113,6 +162,21 @@ export function ClienteDetalhe() {
             </Card>
           </div>
 
+          {data.status !== 'active' && (
+            <div className="mt-4">
+              <Card>
+                <CardTitle className="mb-4">Ativar assinatura</CardTitle>
+                <p className="mb-3 text-sm text-text-secondary">
+                  Marca esta empresa como cliente pago (status "Active") e define o vencimento
+                  para daqui a 1 mês, contado de hoje.
+                </p>
+                <Button onClick={onActivateSubscription} disabled={activateSubscription.isPending}>
+                  {activateSubscription.isPending ? 'Ativando…' : 'Ativar assinatura'}
+                </Button>
+              </Card>
+            </div>
+          )}
+
           <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
             <Card>
               <CardTitle className="mb-4">Histórico de pagamentos</CardTitle>
@@ -166,6 +230,56 @@ export function ClienteDetalhe() {
               </form>
             </Card>
           </div>
+
+          {data.status === 'trial' && (
+            <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <Card>
+                <CardTitle className="mb-4">Prorrogar trial</CardTitle>
+                <div className="flex flex-col gap-3">
+                  <label className="flex items-center gap-2 text-sm text-text-primary">
+                    <input
+                      type="radio"
+                      name="trialAction"
+                      checked={trialAction === 'keep'}
+                      onChange={() => setTrialAction('keep')}
+                    />
+                    Manter data atual ({formatDate(data.endsAt)})
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-text-primary">
+                    <input
+                      type="radio"
+                      name="trialAction"
+                      checked={trialAction === 'extend7'}
+                      onChange={() => setTrialAction('extend7')}
+                    />
+                    Prorrogar +7 dias
+                  </label>
+                  <Button
+                    onClick={onApplyTrialAction}
+                    disabled={trialAction !== 'extend7' || extendTrial.isPending}
+                  >
+                    {extendTrial.isPending ? 'Aplicando…' : 'Aplicar'}
+                  </Button>
+                </div>
+              </Card>
+
+              <Card>
+                <CardTitle className="mb-4">Alterar data final do trial</CardTitle>
+                <div className="flex flex-col gap-3">
+                  <div>
+                    <label className="mb-1 block text-xs text-text-secondary">Nova data final</label>
+                    <Input type="date" value={manualDate} onChange={(e) => setManualDate(e.target.value)} />
+                  </div>
+                  <Button
+                    onClick={onSaveManualDate}
+                    disabled={!manualDate || manualDate === data.endsAt?.slice(0, 10) || setTrialEndsAt.isPending}
+                  >
+                    {setTrialEndsAt.isPending ? 'Salvando…' : 'Salvar nova data'}
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
         </>
       )}
     </Layout>

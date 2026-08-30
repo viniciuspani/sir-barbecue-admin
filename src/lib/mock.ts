@@ -82,6 +82,33 @@ export const mockExpenses: Expense[] = [
   { id: 'e3', name: 'Domínio', category: 'Infraestrutura', amount: 4, incurredAt: '2026-07-01', recurring: true },
 ];
 
+/** Soma `days` dias ao `endsAt` vigente (mock de admin_extend_tenant_trial). */
+export function mockExtendTrial(tenantId: string, days: number): void {
+  const t = mockTenants.find((t) => t.tenantId === tenantId);
+  if (!t?.endsAt) return;
+  const d = new Date(t.endsAt);
+  d.setDate(d.getDate() + days);
+  t.endsAt = d.toISOString().slice(0, 10);
+}
+
+/** Define manualmente o `endsAt` (mock de admin_set_tenant_trial_ends_at). */
+export function mockSetTrialEndsAt(tenantId: string, isoDate: string): void {
+  const t = mockTenants.find((t) => t.tenantId === tenantId);
+  if (t) t.endsAt = isoDate;
+}
+
+/** Ativa a assinatura — status='active', endsAt = hoje + 1 mês (mock de admin_activate_tenant_subscription). */
+export function mockActivateTenantSubscription(tenantId: string): void {
+  const t = mockTenants.find((t) => t.tenantId === tenantId);
+  if (!t) return;
+  const now = new Date();
+  const d = new Date(now);
+  d.setMonth(d.getMonth() + 1);
+  t.status = 'active';
+  t.endsAt = d.toISOString();
+  if (!t.contractStartedAt) t.contractStartedAt = now.toISOString().slice(0, 10);
+}
+
 export function mockTenantDetail(tenantId: string): TenantDetail | null {
   const base = mockTenants.find((t) => t.tenantId === tenantId);
   if (!base) return null;

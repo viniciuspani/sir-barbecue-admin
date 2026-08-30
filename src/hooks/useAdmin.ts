@@ -1,14 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
+  mockActivateTenantSubscription,
   mockErrorLogDetail,
   mockErrorLogs,
   mockExpenses,
+  mockExtendTrial,
   mockFinance,
   mockHealthEvents,
   mockHealthNow,
   mockHealthSummary,
   mockPriceHistoryRetention,
+  mockSetTrialEndsAt,
   mockTenantDetail,
   mockTenants,
 } from '@/lib/mock';
@@ -81,6 +84,62 @@ export function useSetTenantAccess() {
       });
       if (error) throw error;
       return { tenantId, enabled };
+    },
+    onSuccess: (_res, vars) => {
+      void qc.invalidateQueries({ queryKey: keys.tenants });
+      void qc.invalidateQueries({ queryKey: keys.tenant(vars.tenantId) });
+    },
+  });
+}
+
+/** Prorroga o trial em N dias, a partir da data final vigente (RPC admin_extend_tenant_trial). */
+export function useExtendTenantTrial() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ tenantId, days }: { tenantId: string; days: number }) => {
+      if (USE_MOCK) return mockExtendTrial(tenantId, days);
+      const { error } = await supabase.rpc('admin_extend_tenant_trial', {
+        p_tenant_id: tenantId,
+        p_days: days,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_res, vars) => {
+      void qc.invalidateQueries({ queryKey: keys.tenants });
+      void qc.invalidateQueries({ queryKey: keys.tenant(vars.tenantId) });
+    },
+  });
+}
+
+/** Define manualmente a data final do trial (RPC admin_set_tenant_trial_ends_at). */
+export function useSetTenantTrialEndsAt() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ tenantId, trialEndsAt }: { tenantId: string; trialEndsAt: string }) => {
+      if (USE_MOCK) return mockSetTrialEndsAt(tenantId, trialEndsAt);
+      const { error } = await supabase.rpc('admin_set_tenant_trial_ends_at', {
+        p_tenant_id: tenantId,
+        p_trial_ends_at: trialEndsAt,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_res, vars) => {
+      void qc.invalidateQueries({ queryKey: keys.tenants });
+      void qc.invalidateQueries({ queryKey: keys.tenant(vars.tenantId) });
+    },
+  });
+}
+
+/** Ativa a assinatura — trial/past_due/canceled → active, vencimento = hoje + 1 mês (RPC admin_activate_tenant_subscription). */
+export function useActivateTenantSubscription() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ tenantId }: { tenantId: string }) => {
+      if (USE_MOCK) return mockActivateTenantSubscription(tenantId);
+      const { error } = await supabase.rpc('admin_activate_tenant_subscription', {
+        p_tenant_id: tenantId,
+      });
+      if (error) throw error;
     },
     onSuccess: (_res, vars) => {
       void qc.invalidateQueries({ queryKey: keys.tenants });
