@@ -137,6 +137,7 @@ export function ClienteDetalhe() {
                 <Field label="Início do trial" value={formatDate(data.trialStartedAt)} />
                 <Field label="Início do contrato" value={formatDate(data.contractStartedAt)} />
                 <Field label="Telefone" value={data.phone ?? '—'} />
+                <Field label="E-mail" value={data.email ?? '—'} />
               </div>
             </Card>
 

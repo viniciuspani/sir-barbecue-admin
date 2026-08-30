@@ -54,6 +54,8 @@ export type Expense = {
 export type TenantDetail = TenantOverview & {
   cnpj: string | null;
   phone: string | null;
+  /** E-mail de login do dono da empresa (auth.users.email via tenants.owner_user_id). */
+  email: string | null;
   devices: TenantDevice[];
   payments: Payment[];
 };

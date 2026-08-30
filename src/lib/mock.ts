@@ -116,6 +116,7 @@ export function mockTenantDetail(tenantId: string): TenantDetail | null {
     ...base,
     cnpj: '12.345.678/0001-90',
     phone: '(54) 99999-0000',
+    email: `dono@${tenantId}.com.br`,
     devices: Array.from({ length: base.deviceCount }, (_, i) => ({
       deviceId: `${tenantId}-device-${i + 1}`,
       platform: 'android',
