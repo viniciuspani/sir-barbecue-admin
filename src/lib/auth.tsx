@@ -15,6 +15,12 @@ type AuthState = {
 const AuthContext = createContext<AuthState | null>(null);
 
 async function checkIsAdmin(): Promise<boolean> {
+  // Dispensa o gate para permitir desenvolver sem backend — o uso legítimo do
+  // mock. É seguro porque USE_MOCK agora exige DUAS condições simultâneas (build
+  // de desenvolvimento + VITE_USE_MOCK=true) e o vite.config.ts derruba o build
+  // de produção se a flag estiver ligada: em produção esta linha é inalcançável.
+  // Leia o comentário em lib/supabase.ts antes de mexer aqui — até 04/09/2026
+  // bastava faltar uma variável de ambiente para cair neste return.
   if (USE_MOCK) return true;
   const { data, error } = await supabase.rpc('is_platform_admin');
   if (error) return false;

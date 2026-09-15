@@ -5,19 +5,28 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  FileDown,
   Settings,
+  UserMinus,
   Users,
   X,
 } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
+import { useDataExportPendingCount, useDeletionPendingCount } from '@/hooks/useAdmin';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/cn';
 
 const nav = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/clientes', label: 'Clientes', icon: Users, end: false },
+  // Logo depois de Clientes: são visões derivadas dela, e são as filas de
+  // trabalho do dono. Duas entradas porque são assuntos diferentes — sair da
+  // base (com prazo correndo) e pedir uma cópia (sem prazo).
+  // `UserMinus` = cliente saindo; `FileDown` = arquivo.
+  { to: '/solicitacoes', label: 'Exclusões', icon: UserMinus, end: false, badge: 'deletion' },
+  { to: '/exportacoes', label: 'Exportações', icon: FileDown, end: false, badge: 'export' },
   { to: '/financeiro', label: 'Financeiro', icon: BarChart3, end: false },
   { to: '/erros', label: 'Erros', icon: AlertTriangle, end: false },
   { to: '/saude', label: 'Saúde', icon: Activity, end: false },
@@ -26,6 +35,12 @@ const nav = [
 
 export function Layout({ children }: { children: ReactNode }) {
   const { email, signOut } = useAuth();
+  const { data: pendingDeletions = 0 } = useDeletionPendingCount();
+  const { data: pendingExports = 0 } = useDataExportPendingCount();
+  const contadores: Record<string, number> = {
+    deletion: pendingDeletions,
+    export: pendingExports,
+  };
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
 
@@ -86,7 +101,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </button>
         </div>
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3">
-          {nav.map(({ to, label, icon: Icon, end }) => (
+          {nav.map(({ to, label, icon: Icon, end, badge }) => (
             <NavLink
               key={to}
               to={to}
@@ -102,6 +117,14 @@ export function Layout({ children }: { children: ReactNode }) {
             >
               <Icon className="h-4 w-4 shrink-0" />
               {label}
+              {/* Só as duas filas de trabalho têm contador — é a raridade que faz
+                  o badge funcionar. Se todos os itens tivessem, nenhum chamaria
+                  atenção. */}
+              {badge && contadores[badge] > 0 && (
+                <span className="ml-auto inline-flex items-center rounded-full bg-yellow/15 px-2 text-xs font-semibold text-yellow">
+                  {contadores[badge]}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>

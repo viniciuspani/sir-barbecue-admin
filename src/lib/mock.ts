@@ -1,4 +1,6 @@
 import type {
+  DataExportRequest,
+  DeletionRequest,
   ErrorLog,
   ErrorLogDetail,
   ErrorLogFilters,
@@ -28,6 +30,7 @@ export const mockTenants: TenantOverview[] = [
     endsAt: '2026-08-01',
     deviceCount: 2,
     lastPaymentAt: '2026-07-01',
+    deletionRequest: null,
   },
   {
     tenantId: 't2',
@@ -41,6 +44,14 @@ export const mockTenants: TenantOverview[] = [
     endsAt: '2026-07-12',
     deviceCount: 1,
     lastPaymentAt: null,
+    // Com exportação: prazo de 10 dias úteis, aguardando o envio do arquivo.
+    deletionRequest: {
+      id: 'd1',
+      scheduledFor: '2026-09-28T12:00:00Z',
+      exportRequested: true,
+      exportStatus: 'pending',
+      status: 'pending',
+    },
   },
   {
     tenantId: 't3',
@@ -54,6 +65,14 @@ export const mockTenants: TenantOverview[] = [
     endsAt: '2026-06-20',
     deviceCount: 3,
     lastPaymentAt: '2026-05-20',
+    // Sem exportação: 48h. É o caso urgente — o que vence primeiro.
+    deletionRequest: {
+      id: 'd2',
+      scheduledFor: '2026-09-15T17:12:00Z',
+      exportRequested: false,
+      exportStatus: 'not_requested',
+      status: 'pending',
+    },
   },
   {
     tenantId: 't4',
@@ -67,6 +86,7 @@ export const mockTenants: TenantOverview[] = [
     endsAt: '2026-05-01',
     deviceCount: 0,
     lastPaymentAt: '2026-04-01',
+    deletionRequest: null,
   },
 ];
 
@@ -125,7 +145,208 @@ export function mockTenantDetail(tenantId: string): TenantDetail | null {
       lastSeenAt: '2026-07-08',
     })),
     payments: mockPayments.filter((p) => p.tenantId === tenantId),
+    deletionRequest: mockDeletionList.find((r) => r.tenantId === tenantId && r.status === 'pending') ?? null,
   };
+}
+
+// ── Solicitações de exclusão de conta (MIGRATION_24) ─────────────────────────
+// Array mutável: as funções abaixo simulam a escrita mexendo nele, e o
+// invalidateQueries dos hooks faz a mudança aparecer na tela (mesmo padrão de
+// mockExtendTrial).
+const mockDeletionList: DeletionRequest[] = [
+  {
+    id: 'd2',
+    tenantId: 't3',
+    tenantName: 'Brasa & Cia',
+    requestedAt: '2026-09-13T17:12:00Z',
+    scheduledFor: '2026-09-15T17:12:00Z',
+    exportRequested: false,
+    status: 'pending',
+    exportStatus: 'not_requested',
+    exportSentAt: null,
+    exportDeliveredAt: null,
+    exportOpenedAt: null,
+    exportDeliveryManual: false,
+    contactName: 'Maria Souza',
+    contactPhone: '(21) 97777-1111',
+    contactEmail: 'maria@brasaecia.com.br',
+    canceledAt: null,
+    canceledByAdmin: false,
+    completedAt: null,
+    lastError: null,
+  },
+  {
+    id: 'd1',
+    tenantId: 't2',
+    tenantName: 'Espetaria do João',
+    requestedAt: '2026-09-14T14:30:00Z',
+    scheduledFor: '2026-09-28T12:00:00Z',
+    exportRequested: true,
+    status: 'pending',
+    exportStatus: 'pending',
+    exportSentAt: null,
+    exportDeliveredAt: null,
+    exportOpenedAt: null,
+    exportDeliveryManual: false,
+    contactName: 'João da Silva',
+    contactPhone: '(11) 98888-7777',
+    contactEmail: 'joao@espetariadojoao.com.br',
+    canceledAt: null,
+    canceledByAdmin: false,
+    completedAt: null,
+    lastError: null,
+  },
+  {
+    // Já atendida: mostra que o histórico sobrevive à exclusão da empresa
+    // (tenantId null) e que o contato é ANONIMIZADO na execução.
+    id: 'd3',
+    tenantId: null,
+    tenantName: 'Espeto de Ouro',
+    requestedAt: '2026-08-20T10:00:00Z',
+    scheduledFor: '2026-09-03T12:00:00Z',
+    exportRequested: true,
+    status: 'completed',
+    exportStatus: 'delivered',
+    exportSentAt: '2026-09-03T12:01:00Z',
+    exportDeliveredAt: '2026-09-03T12:01:40Z',
+    exportOpenedAt: '2026-09-03T13:22:00Z',
+    exportDeliveryManual: false,
+    contactName: null,
+    contactPhone: null,
+    contactEmail: null,
+    canceledAt: null,
+    canceledByAdmin: false,
+    completedAt: '2026-09-03T12:05:00Z',
+    lastError: null,
+  },
+];
+
+export function mockDeletionRequests(filters: {
+  status?: string;
+  exportRequested?: boolean | null;
+  search?: string;
+}): DeletionRequest[] {
+  const status = filters.status ?? 'pending';
+  const term = (filters.search ?? '').toLowerCase();
+  return mockDeletionList
+    .filter((r) => status === 'all' || r.status === status)
+    .filter((r) => filters.exportRequested == null || r.exportRequested === filters.exportRequested)
+    .filter(
+      (r) =>
+        !term ||
+        r.tenantName.toLowerCase().includes(term) ||
+        (r.contactName ?? '').toLowerCase().includes(term) ||
+        (r.contactEmail ?? '').toLowerCase().includes(term),
+    )
+    .sort((a, b) => a.scheduledFor.localeCompare(b.scheduledFor));
+}
+
+export function mockDeletionPendingCount(): number {
+  return mockDeletionList.filter((r) => r.status === 'pending').length;
+}
+
+export function mockCancelDeletionRequest(id: string): { id: string } {
+  const r = mockDeletionList.find((x) => x.id === id);
+  if (r) {
+    r.status = 'canceled';
+    r.canceledAt = new Date().toISOString();
+    r.canceledByAdmin = true;
+  }
+  return { id };
+}
+
+export function mockMarkExportSent(id: string): { id: string } {
+  const r = mockDeletionList.find((x) => x.id === id);
+  if (r) {
+    r.exportStatus = 'delivered';
+    r.exportSentAt = r.exportSentAt ?? new Date().toISOString();
+    r.exportDeliveredAt = new Date().toISOString();
+    r.exportDeliveryManual = true;
+    if (r.status === 'failed') r.status = 'pending';
+  }
+  return { id };
+}
+
+// ── Solicitações de EXPORTAÇÃO de dados (MIGRATION_25) ───────────────────────
+const mockExportList: DataExportRequest[] = [
+  {
+    id: 'x1',
+    tenantId: 't1',
+    tenantName: 'Churrasquinho do Zé',
+    tenantPhone: '(54) 99999-0000',
+    createdAt: '2026-09-15T11:40:00Z',
+    status: 'pending',
+    contactEmail: 'ze@churrasquinho.com.br',
+    sentAt: null,
+    deliveredAt: null,
+    openedAt: null,
+    deliveryManual: false,
+    completedAt: null,
+    errorMessage: null,
+  },
+  {
+    id: 'x2',
+    tenantId: 't4',
+    tenantName: 'Point do Espeto',
+    tenantPhone: null,
+    createdAt: '2026-09-10T09:00:00Z',
+    status: 'delivered',
+    contactEmail: 'contato@pointdoespeto.com.br',
+    sentAt: '2026-09-10T10:00:12Z',
+    deliveredAt: '2026-09-10T10:00:19Z',
+    openedAt: null,
+    deliveryManual: false,
+    completedAt: '2026-09-10T10:00:12Z',
+    errorMessage: null,
+  },
+];
+
+export function mockDataExportRequests(filters: {
+  status?: string;
+  search?: string;
+}): DataExportRequest[] {
+  const status = filters.status ?? 'pending';
+  const term = (filters.search ?? '').toLowerCase();
+  return mockExportList
+    .filter((r) => status === 'all' || r.status === status)
+    .filter(
+      (r) =>
+        !term ||
+        r.tenantName.toLowerCase().includes(term) ||
+        (r.contactEmail ?? '').toLowerCase().includes(term),
+    )
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+}
+
+export function mockDataExportPendingCount(): number {
+  return mockExportList.filter((r) => r.status === 'pending' || r.status === 'sent').length;
+}
+
+export function mockMarkDataExportDelivered(id: string): { id: string } {
+  const r = mockExportList.find((x) => x.id === id);
+  if (r) {
+    r.status = 'delivered';
+    r.sentAt = r.sentAt ?? new Date().toISOString();
+    r.deliveredAt = new Date().toISOString();
+    r.deliveryManual = true;
+    r.completedAt = r.completedAt ?? new Date().toISOString();
+  }
+  return { id };
+}
+
+export function mockExecuteDeletionNow(id: string): { id: string } {
+  const r = mockDeletionList.find((x) => x.id === id);
+  if (r) {
+    r.status = 'completed';
+    r.completedAt = new Date().toISOString();
+    // Espelha o que delete_tenant_cascade faz: preserva o histórico e apaga o
+    // dado pessoal.
+    r.tenantId = null;
+    r.contactName = null;
+    r.contactPhone = null;
+    r.contactEmail = null;
+  }
+  return { id };
 }
 
 export const mockPriceHistoryRetention: PriceHistoryRetention = {

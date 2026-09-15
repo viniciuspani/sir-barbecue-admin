@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { DeletionRequestCard } from '@/components/DeletionRequestCard';
 import { Layout, PageHeader } from '@/components/Layout';
 import { StatusBadge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -122,6 +123,10 @@ export function ClienteDetalhe() {
               </div>
             }
           />
+
+          {/* Acima da Assinatura de propósito: a solicitação muda o sentido de
+              tudo o que vem depois. */}
+          {data.deletionRequest && <DeletionRequestCard request={data.deletionRequest} />}
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <Card>

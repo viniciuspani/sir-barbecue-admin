@@ -76,6 +76,16 @@ export function Clientes() {
                   <DataRow label="Vencimento" value={formatDate(t.endsAt)} />
                   <DataRow label="Últ. pagamento" value={formatDate(t.lastPaymentAt)} />
                   <DataRow label="Devices" value={t.deviceCount} />
+                  {t.deletionRequest && (
+                    <DataRow
+                      label="Exclusão"
+                      value={
+                        <span className="text-yellow">
+                          {formatDate(t.deletionRequest.scheduledFor)}
+                        </span>
+                      }
+                    />
+                  )}
                 </div>
               </button>
               <div className="mt-2 flex items-center justify-between border-t border-divider pt-3">
@@ -114,7 +124,16 @@ export function Clientes() {
                   onClick={() => navigate(`/clientes/${t.tenantId}`)}
                   className="cursor-pointer border-t border-divider bg-bg transition-colors hover:bg-surface-hover"
                 >
-                  <td className="px-4 py-3 font-medium text-text-primary">{t.name}</td>
+                  <td className="px-4 py-3 font-medium text-text-primary">
+                    {t.name}
+                    {/* Fecha o circuito de descoberta: o dono varre a lista, não
+                        o detalhe de cada cliente. */}
+                    {t.deletionRequest && (
+                      <span className="block text-xs font-normal text-yellow">
+                        Exclusão em {formatDate(t.deletionRequest.scheduledFor)}
+                      </span>
+                    )}
+                  </td>
                   <td className="px-4 py-3"><StatusBadge status={t.status} /></td>
                   <td className="px-4 py-3 text-text-secondary">
                     {t.monthlyPrice > 0 ? formatBRL(t.monthlyPrice) : '—'}

@@ -1,6 +1,7 @@
 import { AlertTriangle, CheckCircle2, Clock, TrendingUp } from 'lucide-react';
 import type { ReactNode } from 'react';
 
+import { DeletionRequestsStrip } from '@/components/DeletionRequestsStrip';
 import { Layout, PageHeader } from '@/components/Layout';
 import { SystemHealthCard } from '@/components/SystemHealthCard';
 import { Card } from '@/components/ui/Card';
@@ -26,6 +27,11 @@ export function Dashboard() {
   return (
     <Layout>
       <PageHeader title="Dashboard" subtitle="Visão geral do negócio" />
+
+      {/* Acima do grid de KPIs: é a única informação da página com PRAZO. Tem
+          query própria, então não trava no `isLoading` do resumo financeiro. */}
+      <DeletionRequestsStrip />
+
       {isLoading || !data ? (
         <CenteredSpinner />
       ) : (

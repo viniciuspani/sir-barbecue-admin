@@ -356,13 +356,30 @@ conexão disponível.
 
 8.1 ENCERRAMENTO PELO USUÁRIO
 
-Você pode excluir sua conta a qualquer momento, diretamente no Aplicativo,
-em "Mais" > "Conta" > "Excluir conta".
+Você pode solicitar a exclusão da sua conta a qualquer momento, diretamente no
+Aplicativo, em "Mais" > "Conta" > "Excluir conta".
 
-ATENÇÃO: a exclusão é IRREVERSÍVEL. Se você é o dono da empresa, a ação
-elimina também a empresa e TODOS os seus dados — produtos, vendas, estoque,
-fornecedores, relatórios e os vínculos de todos os membros da equipe.
-Exporte o que precisar guardar ANTES de confirmar.
+A exclusão NÃO acontece no mesmo instante: ao confirmar, fica registrada uma
+solicitação com DATA MARCADA, informada a você na tela antes da confirmação.
+O prazo depende da opção escolhida:
+
+• COM cópia dos dados por e-mail: até 10 (dez) DIAS ÚTEIS. Na data, enviamos ao
+  e-mail cadastrado um link para baixar o histórico completo da empresa em
+  arquivo .zip e, em seguida, excluímos os dados.
+• SEM cópia dos dados: 48 (quarenta e oito) HORAS após a solicitação.
+
+Até a data, o Aplicativo fica disponível apenas para CONSULTA (não é possível
+registrar vendas nem alterar cadastros) e você pode CANCELAR a solicitação
+quando quiser, pelo próprio Aplicativo, voltando tudo ao normal sem perda de
+dados.
+
+ATENÇÃO: cumprido o prazo, a exclusão é IRREVERSÍVEL. Se você é o dono da
+empresa, a ação elimina também a empresa e TODOS os seus dados — produtos,
+vendas, estoque, fornecedores, relatórios e os vínculos de todos os membros da
+equipe. Avise sua equipe antes de solicitar.
+
+Para membros que não são donos da empresa (gerentes e funcionários), a exclusão
+da conta continua sendo imediata e não afeta os dados da empresa.
 
 8.2 SUSPENSÃO OU ENCERRAMENTO PELA EMPRESA
 

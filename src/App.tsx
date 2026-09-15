@@ -8,10 +8,12 @@ import { Configuracoes } from '@/pages/Configuracoes';
 import { ConfirmarEmail } from '@/pages/ConfirmarEmail';
 import { Dashboard } from '@/pages/Dashboard';
 import { Erros } from '@/pages/Erros';
+import { Exportacoes } from '@/pages/Exportacoes';
 import { Financeiro } from '@/pages/Financeiro';
 import { Login } from '@/pages/Login';
 import { PoliticaDePrivacidade } from '@/pages/PoliticaDePrivacidade';
 import { Saude } from '@/pages/Saude';
+import { Solicitacoes } from '@/pages/Solicitacoes';
 import { TermosDeUso } from '@/pages/TermosDeUso';
 import { TrocarSenha } from '@/pages/TrocarSenha';
 
@@ -52,6 +54,8 @@ function AdminApp() {
       <Route path="/" element={<Dashboard />} />
       <Route path="/clientes" element={<Clientes />} />
       <Route path="/clientes/:tenantId" element={<ClienteDetalhe />} />
+      <Route path="/solicitacoes" element={<Solicitacoes />} />
+      <Route path="/exportacoes" element={<Exportacoes />} />
       <Route path="/financeiro" element={<Financeiro />} />
       <Route path="/erros" element={<Erros />} />
       <Route path="/saude" element={<Saude />} />

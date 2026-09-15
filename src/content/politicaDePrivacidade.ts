@@ -383,6 +383,13 @@ III.  ANONIMIZAÇÃO, BLOQUEIO OU ELIMINAÇÃO — Solicitar que dados
 
 IV.   PORTABILIDADE — Solicitar a portabilidade dos seus dados a outro
       fornecedor de serviço, observados os segredos comercial e industrial.
+      Você mesmo pode pedir uma cópia completa a qualquer momento, dentro do
+      Aplicativo, em "Mais" > "Exportar dados": preparamos um arquivo .zip com
+      uma planilha (.csv) por tipo de informação — vendas, itens de venda,
+      comandas, estoque e movimentações, fornecedores e custos, produtos,
+      categorias, pagamentos da assinatura e os relatórios já gerados — e
+      enviamos para o e-mail cadastrado em até 48 (quarenta e oito) horas. O
+      pedido não altera nem encerra a sua conta.
 
 V.    ELIMINAÇÃO DOS DADOS — Solicitar a eliminação dos dados tratados com
       base no seu consentimento, exceto nos casos previstos em lei. Você
@@ -449,12 +456,40 @@ rastreamento de terceiros.
   o próprio serviço consiste no histórico da operação do seu negócio.
 
 • EXCLUSÃO DA CONTA: A exclusão está disponível dentro do Aplicativo, em
-  "Mais" > "Conta" > "Excluir conta". A ação é IRREVERSÍVEL e, ao ser
-  confirmada, elimina IMEDIATAMENTE dos nossos servidores:
+  "Mais" > "Conta" > "Excluir conta". Ao confirmar, você registra uma
+  SOLICITAÇÃO DE EXCLUSÃO com data marcada — a conta não é apagada no mesmo
+  instante. No momento da solicitação você escolhe entre duas opções:
+
+  - COM cópia dos dados: a exclusão ocorre em até 10 (dez) DIAS ÚTEIS. Nessa
+    data enviamos ao e-mail cadastrado um link para baixar um arquivo .zip com
+    o histórico completo da sua empresa e, em seguida, eliminamos os dados. O
+    link de download fica válido por 30 (trinta) dias.
+  - SEM cópia dos dados: a exclusão ocorre 48 (quarenta e oito) HORAS após a
+    solicitação.
+
+  A data prevista é exibida na tela antes da confirmação e fica visível no
+  Aplicativo durante toda a espera.
+
+  DURANTE O PRAZO: o Aplicativo permanece acessível apenas para CONSULTA — não
+  é possível registrar vendas nem alterar cadastros —, e a solicitação pode ser
+  CANCELADA a qualquer momento pelo dono da empresa, dentro do próprio
+  Aplicativo. O cancelamento restabelece o funcionamento normal e nenhum dado é
+  perdido. Essa janela existe justamente para evitar perda acidental de dados.
+
+  CUMPRIDO O PRAZO, a exclusão é IRREVERSÍVEL e elimina dos nossos servidores:
   - sua conta de usuário e as credenciais de autenticação;
   - as empresas das quais você é o dono, com todos os respectivos dados
     (produtos, vendas, estoque, fornecedores, relatórios e equipe);
   - seus vínculos com empresas de terceiros das quais você era apenas membro.
+
+  Se você é apenas MEMBRO de uma empresa (gerente ou funcionário), e não o
+  dono, a exclusão da sua conta continua sendo IMEDIATA: não há prazo de espera
+  nem envio de cópia, porque os dados da empresa não lhe pertencem.
+
+  Conservamos, após a exclusão, um registro mínimo da própria solicitação (nome
+  da empresa, datas e se houve pedido de cópia dos dados), para comprovar o
+  atendimento do seu pedido. Os dados de contato informados na solicitação
+  (nome, telefone e e-mail) são APAGADOS no momento da exclusão.
 
   Cópias de segurança (backups) da infraestrutura podem reter os dados por
   até 30 (trinta) dias após a exclusão, sendo sobrescritas automaticamente
@@ -464,6 +499,24 @@ rastreamento de terceiros.
   Dados armazenados no seu dispositivo são eliminados ao desinstalar o
   Aplicativo ou ao limpar os dados do aplicativo nas configurações do
   sistema.
+
+• SE VOCÊ É MEMBRO DE UMA EMPRESA (gerente ou funcionário) e a empresa
+  excluir a conta dela, o seu acesso àquela empresa termina — mas a SUA
+  conta pessoal NÃO é excluída junto. Ela continua sua: você é o titular dos
+  seus dados de cadastro, e a empresa não pode eliminá-los. Nessa situação:
+
+  - avisamos você por e-mail assim que isso acontecer;
+  - você pode voltar a usar o Aplicativo normalmente se for adicionado a
+    qualquer outra empresa, com o mesmo login;
+  - você pode excluir a sua conta quando quiser, pela própria tela que
+    aparece ao entrar. Para membros, essa exclusão é IMEDIATA: não há prazo
+    de espera nem envio de cópia, porque os dados da empresa não lhe
+    pertencem;
+  - se a sua conta permanecer 6 (seis) meses sem vínculo com nenhuma
+    empresa, nós a encerramos, junto com o seu cadastro — manter um cadastro
+    sem finalidade contraria a própria LGPD. Avisamos por e-mail com pelo
+    menos 15 (quinze) dias de antecedência, e basta ser adicionado a alguma
+    empresa antes da data para que a conta seja mantida.
 
 • EXCEÇÕES LEGAIS: Podemos reter, mesmo após a exclusão, dados cuja guarda
   seja exigida por lei (Art. 16 da LGPD), notadamente:
